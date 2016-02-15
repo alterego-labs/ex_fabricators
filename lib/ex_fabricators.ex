@@ -1,0 +1,2 @@
+defmodule ExFabricators do
+end
