@@ -9,8 +9,15 @@ It is a dirty implementation which has a many restrictions but is good enough fo
 
 ## Installation
 
-Right now this library does not exists in the Hex package manager, but you can install it
-from github:
+You can install this package from Hex:
+
+```elixir
+  def deps do
+    [{:ex_fabricators, "~> 0.0.1"}]
+  end
+```
+
+Or you can install it from github:
 
 ```elixir
   def deps do
