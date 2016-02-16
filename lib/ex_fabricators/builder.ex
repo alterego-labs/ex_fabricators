@@ -30,13 +30,13 @@ defmodule ExFabricators.Builder do
   @doc false
   defmacro __using__(_) do
     quote do
-      import ExFabricator.Builder, only: [fabricator: 3]
+      import ExFabricators.Builder, only: [fabricator: 3]
 
       def build(name) do
         build(name, %{})
       end
 
-      @before_compile ExFabricator.Builder
+      @before_compile ExFabricators.Builder
     end
   end
 
