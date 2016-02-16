@@ -13,7 +13,7 @@ You can install this package from Hex:
 
 ```elixir
   def deps do
-    [{:ex_fabricators, "~> 0.0.1"}]
+    [{:ex_fabricators, "~> 0.0.2"}]
   end
 ```
 
