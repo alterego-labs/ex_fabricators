@@ -13,8 +13,8 @@ defmodule ExFabricators.BuildersRepo do
     Agent.get(__MODULE__, &(&1))
   end
 
-  @spec put(config) :: :ok
-  def put(config) do
+  @spec update(config) :: :ok
+  def update(config) do
     Agent.update(__MODULE__, fn(_) -> config end)
   end
 end

@@ -71,7 +71,7 @@ defmodule ExFabricators.Builder do
   end
 
   def merge(current_config, new_config) do
-    # TODO: Validate for double entries also
+    ExFabricators.validate!(current_config, new_config)
     Keyword.merge(current_config, new_config)   
   end
 
