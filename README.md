@@ -61,3 +61,39 @@ The you can provide some dependencies for the building structs:
 ```elixir
   fabricator :event, YourApp.Structs.Event, %{home_team: Fabricators.build(:team)}
 ```
+
+## Multifile support
+
+During the time the single point for defining fabricators becomes the mess of unmantainable code.
+So for first I think we must to have ability to define fabricators in different files and
+load them in `test_helper`.
+
+Let's consider an example:
+
+```elixir test/fabriactors/team_fabricator.ex
+use ExFabricators.Builder
+
+fabricator :team, YourApp.Structs.Team, %{}
+```
+
+```elixir test/fabriactors/event_fabricator.ex
+use ExFabricators.Builder
+
+fabricator :event, YourApp.Structs.Event %{}
+```
+
+```elixir test/test_helper.exs
+ExFabricators.take_all!()
+```
+
+API for calling fabricators in tests will be changed a little:
+
+```elixir
+defmodule ... do
+  test "..." do
+    team = ExFabricators.build :team
+  end
+end
+```
+
+This is the most wanted feature and will be included to release _v0.1.0_.
