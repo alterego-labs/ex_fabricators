@@ -10,7 +10,8 @@ defmodule ExFabricators do
 
   So in `test/test_helper.exs` you must to add the next line:
 
-    ExFabricators.take_all!("path/to/fabricators/folder")
+    ExFabricators.take_all!(Path.join(File.cwd!, "test/fabricators"))
+    
   """
   @spec take_all!(String.t) :: any
   def take_all!(fabricators_path) do

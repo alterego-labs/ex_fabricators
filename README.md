@@ -27,73 +27,44 @@ Or you can install it from github:
 
 ## Usage
 
-For first you need to define a context in which you will define fabricators. For example, it
-may be `test/fabricators.ex`:
+For first you must to define your fabricators. By default the folder for fabricators is
+`test/fabricators` so just add under this folder files with content like the following:
 
 ```elixir
-  defmodule Fabricators do
-    use ExFabricators.Builder
+use ExFabricators.Builder
 
-    fabricator :team, YourApp.Structs.Team, %{}
-  end
+fabricator :team, YourApp.Structs.Team
+```
+
+Save code above into `test/fabricators/team_fabricator.exs` file. Always name files by 
+`<context>_fabricator.exs` pattern because this package expects it.
+
+The next step is to load fabricators. For this add the next line into `test_helper.exs`:
+
+```elixir
+ExFabricators.take_all!(Path.join(File.cwd!, "test/fabricators"))
 ```
 
 Then in tests or in setup callbacks you can run fabricators like this:
 
 ```elixir
-  Fabricators.build :team
+  Fabricators.build(:team)
 ```
 
 As a result you give initialized `YourApp.Structs.Team` struct with default properties.
 
 If you try to build undefined fabricator `RuntimeError` will be thrown.
 
-The last parameter of the `fabricator/3` macro is a Map with options. So, for example,
-if your Team struct has `id`
-property and you want to set it while building do it like the following:
+The last parameter of the `fabricator/3` macro is an anonymous function that must return a Map.
+So, for example, if your Team struct has `id` property and you want to set it while building do it
+like the following:
   
 ```elixir
-  fabricator :team, YourApp.Structs.Team, %{id: 2}
+  fabricator :team, YourApp.Structs.Team, fn -> %{id: 2} end
 ```
 
 The you can provide some dependencies for the building structs:
   
 ```elixir
-  fabricator :event, YourApp.Structs.Event, %{home_team: Fabricators.build(:team)}
+  fabricator :event, YourApp.Structs.Event, fn -> %{home_team: Fabricators.build(:team)} end
 ```
-
-## Multifile support
-
-During the time the single point for defining fabricators becomes the mess of unmantainable code.
-So for first I think we must to have ability to define fabricators in different files and
-load them in `test_helper`.
-
-Let's consider an example:
-
-```elixir test/fabriactors/team_fabricator.ex
-use ExFabricators.Builder
-
-fabricator :team, YourApp.Structs.Team, %{}
-```
-
-```elixir test/fabriactors/event_fabricator.ex
-use ExFabricators.Builder
-
-fabricator :event, YourApp.Structs.Event %{}
-```
-
-```elixir test/test_helper.exs
-ExFabricators.take_all!()
-```
-
-API for calling fabricators in tests will be changed a little:
-
-```elixir
-defmodule ... do
-  test "..." do
-    team = ExFabricators.build :team
-  end
-end
-```
-
-This is the most wanted feature and will be included to release _v0.1.0_.
