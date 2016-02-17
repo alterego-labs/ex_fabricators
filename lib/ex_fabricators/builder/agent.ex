@@ -1,7 +1,7 @@
 defmodule ExFabricators.Builder.Agent do
   @moduledoc false
 
-  @typep config :: Keyword.t
+  @typep fabricators :: Keyword.t
 
   @spec start_link() :: {:ok, pid}
   def start_link do
@@ -13,13 +13,13 @@ defmodule ExFabricators.Builder.Agent do
     Agent.stop(agent)
   end
 
-  @spec get(pid) :: config
+  @spec get(pid) :: fabricators
   def get(agent) do
     Agent.get(agent, &(&1))
   end
 
-  @spec merge(pid, config) :: config
-  def merge(agent, new_config) do
-    Agent.update(agent, &ExFabricators.Builder.merge(&1, new_config))
+  @spec merge(pid, fabricators) :: fabricators
+  def merge(agent, new_fabricators) do
+    Agent.update(agent, &ExFabricators.Builder.merge(&1, new_fabricators))
   end
 end

@@ -1,4 +1,4 @@
-defmodule ExFabricators.BuildersRepo do
+defmodule ExFabricators.FabricatorsRepo do
   @moduledoc false
 
   @typep fabricators :: Keyword.t

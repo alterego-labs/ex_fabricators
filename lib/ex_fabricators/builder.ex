@@ -10,27 +10,27 @@ defmodule ExFabricators.Builder do
   income for a testable module function callings.
 
   For first you need to define a context in which you will define fabricators. For example, it
-  may be `test/fabricators.ex`:
+  may be `test/fabricators/team_fabricator.exs`:
 
-    defmodule Fabricators do
-      use ExFabricators.Builder
+    use ExFabricators.Builder
 
-      fabricator :team, YourApp.Structs.Team, %{}
-    end
+    fabricator :team, YourApp.Structs.Team
 
   Then in tests or in setup callbacks you can run fabricators like this:
     
-    Fabricators.build :team
+    Fabricators.build(:team)
 
   As a result you give initialized `YourApp.Structs.Team` struct with default properties.
 
   If you try to build undefined fabricator `RuntimeError` will be thrown.
   """
 
+  @typep fabricators :: Keyword.t
+
   @doc false
   defmacro __using__(_) do
     quote do
-      import ExFabricators.Builder, only: [fabricator: 3, fabricator: 2]
+      import unquote(__MODULE__), only: [fabricator: 3, fabricator: 2]
       {:ok, agent} = ExFabricators.Builder.Agent.start_link()
       var!(builder_agent, ExFabricators.Builder) = agent
     end
@@ -41,16 +41,16 @@ defmodule ExFabricators.Builder do
   
   ## Examples:
 
-    fabricator :team, YourApp.Structs.Team, %{}
+    fabricator :team, YourApp.Structs.Team
 
   The last parameter is a Map with options. So, for example, if your Team struct has `id`
   property and you want to set it while building do it like the following:
     
-    fabricator :team, YourApp.Structs.Team, %{id: 2}
+    fabricator :team, YourApp.Structs.Team, fn -> %{id: 2} end
 
   The you can provide some dependencies for the building structs:
     
-    fabricator :event, YourApp.Structs.Event, %{home_team: Fabricators.build(:team)}
+    fabricator :event, YourApp.Structs.Event, fn -> %{home_team: Fabricators.build(:team)} end
   """
   defmacro fabricator(name, struct, default_options) do
     quote do
@@ -70,12 +70,13 @@ defmodule ExFabricators.Builder do
     end
   end
 
-  def merge(current_config, new_config) do
-    ExFabricators.validate!(current_config, new_config)
-    Keyword.merge(current_config, new_config)   
-  end
-
-  defp name do
-    
+  @doc """
+  Merges new fabricators entries into the registry.
+  Also do validations for double entries with the same names.
+  """
+  @spec merge(fabricators, fabricators) :: fabricators | none
+  def merge(registry, new_fabricators) do
+    ExFabricators.validate!(registry, new_fabricators)
+    Keyword.merge(registry, new_fabricators)   
   end
 end
