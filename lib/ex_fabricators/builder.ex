@@ -30,7 +30,7 @@ defmodule ExFabricators.Builder do
   @doc false
   defmacro __using__(_) do
     quote do
-      import ExFabricators.Builder, only: [fabricator: 3]
+      import ExFabricators.Builder, only: [fabricator: 3, fabricator: 2]
       {:ok, agent} = ExFabricators.Builder.Agent.start_link()
       var!(builder_agent, ExFabricators.Builder) = agent
     end
@@ -56,7 +56,16 @@ defmodule ExFabricators.Builder do
     quote do
       ExFabricators.Builder.Agent.merge(
         var!(builder_agent, ExFabricators.Builder),
-        {unquote(name), {unquote(struct), unquote(default_options)}}
+        [{unquote(name), {unquote(struct), unquote(default_options)}}]
+      )
+    end
+  end
+
+  defmacro fabricator(name, struct) do
+    quote do
+      ExFabricators.Builder.Agent.merge(
+        var!(builder_agent, ExFabricators.Builder),
+        [{unquote(name), {unquote(struct), fn -> %{} end}}]
       )
     end
   end
@@ -64,5 +73,9 @@ defmodule ExFabricators.Builder do
   def merge(current_config, new_config) do
     # TODO: Validate for double entries also
     Keyword.merge(current_config, new_config)   
+  end
+
+  defp name do
+    
   end
 end

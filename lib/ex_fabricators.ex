@@ -15,7 +15,7 @@ defmodule ExFabricators do
     |> instantiate_struct(options)
   end
 
-  defp fetch_and_merge_all_builders(fabriactors_path) do
+  defp fetch_and_merge_all_builders(fabricators_path) do
     fabricators_path
     |> Path.join("*_fabricator.exs")
     |> Path.wildcard
@@ -32,7 +32,7 @@ defmodule ExFabricators do
   end
 
   defp read_file!(file) do
-   try do
+    try do
       {config, binding} = Code.eval_file(file)
 
       config = case List.keyfind(binding, {:builder_agent, ExFabricators.Builder}, 0) do
@@ -63,9 +63,9 @@ defmodule ExFabricators do
     end)
   end
 
-  defp instantiate_struct({struct, default_options}, options) do
+  defp instantiate_struct({struct, default_options_fn}, options) do
     struct
-    |> Kernel.struct(default_options)
+    |> Kernel.struct(default_options_fn.())
     |> Map.merge(options)
   end
 end
