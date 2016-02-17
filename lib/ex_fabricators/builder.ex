@@ -31,12 +31,8 @@ defmodule ExFabricators.Builder do
   defmacro __using__(_) do
     quote do
       import ExFabricators.Builder, only: [fabricator: 3]
-
-      def build(name) do
-        build(name, %{})
-      end
-
-      @before_compile ExFabricators.Builder
+      {:ok, agent} = ExFabricators.Builder.Agent.start_link()
+      var!(builder_agent, ExFabricators.Builder) = agent
     end
   end
 
@@ -58,19 +54,15 @@ defmodule ExFabricators.Builder do
   """
   defmacro fabricator(name, struct, default_options) do
     quote do
-      def build(unquote(name), options) do
-        Kernel.struct(unquote(struct), unquote(default_options))
-        |> Map.merge(options)
-      end
+      ExFabricators.Builder.Agent.merge(
+        var!(builder_agent, ExFabricators.Builder),
+        {unquote(name), {unquote(struct), unquote(default_options)}}
+      )
     end
   end
 
-  @doc false
-  defmacro __before_compile__(env) do
-    quote do
-      def build(undefined_name, _options) do
-        raise RuntimeError, "Undefined fabricator for '" <> Atom.to_string(undefined_name) <> "'!"
-      end
-    end
+  def merge(current_config, new_config) do
+    # TODO: Validate for double entries also
+    Keyword.merge(current_config, new_config)   
   end
 end
